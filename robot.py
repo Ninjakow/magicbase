@@ -1,6 +1,7 @@
 import magicbot
 import wpilib
 
+from ctre import CANTalon
 from components.chassis import Chassis
 from components.bno055 import BNO055
 
@@ -17,6 +18,14 @@ class Robot(magicbot.MagicRobot):
 
     def createObjects(self):
         '''Create motors and stuff here'''
+
+        self.drive_motor_a = CANTalon(2)
+        self.drive_motor_b = CANTalon(5)
+        self.drive_motor_c = CANTalon(4)
+        self.drive_motor_d = CANTalon(3)
+
+        self.drive_motor_c.setInverted(True)
+        self.drive_motor_d.setInverted(True)
 
         # Objects that are created here are shared with all classes
         # that declare them. For example, if I had:
