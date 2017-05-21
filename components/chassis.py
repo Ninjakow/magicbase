@@ -53,20 +53,18 @@ class Chassis:
         self.drive_motor_a.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder)
         self.drive_motor_c.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder)
 
-    def set_point(self, meters1, meters2):
+    def set_point(self, meters):
         for motor in self.motors:
             motor.setPosition(0)
 
-        self.setpoint1 = self.counts_per_revolution * (self.rotations_per_meter * meters1)
-        self.setpoint2 = self.counts_per_revolution * (self.rotations_per_meter * meters2)
-        print(self.setpoint1, self.setpoint2)
+        self.setpoint = self.counts_per_revolution * (self.rotations_per_meter * meters)
 
-        self.drive_motor_a.set(self.setpoint1)
+        self.drive_motor_a.set(self.setpoint)
         self.drive_motor_b.set(2)
-        self.drive_motor_c.set(self.setpoint2)
+        self.drive_motor_c.set(self.setpoint)
         self.drive_motor_d.set(4)
 
-        return self.setpoint1, self.setpoint2
+        return self.setpoint
 
     def get_pos(self):
         return [self.drive_motor_a.getPosition()/self.counts_per_meter,
