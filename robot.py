@@ -60,11 +60,11 @@ class Robot(magicbot.MagicRobot):
     def putData(self):
         # update the data on the smart dashboard
         # put the inputs to the dashboard
-        self.sd.putDouble("i_x", self.chassis.inputs[0])
-        self.sd.putDouble("i_y", self.chassis.inputs[1])
-        self.sd.putDouble("i_z", self.chassis.inputs[2])
-        self.sd.putDouble("i_t", self.chassis.inputs[3])
-        self.sd.putDouble("heading", self.bno055.getHeading())
+        self.sd.putNumber("i_x", self.chassis.inputs[0])
+        self.sd.putNumber("i_y", self.chassis.inputs[1])
+        self.sd.putNumber("i_z", self.chassis.inputs[2])
+        self.sd.putNumber("i_t", self.chassis.inputs[3])
+        self.sd.putNumber("heading", self.bno055.getHeading())
 
     def teleopInit(self):
         '''Called when teleop starts; optional'''

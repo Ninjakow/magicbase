@@ -13,13 +13,13 @@ class Chassis:
     drive_motor_b = CANTalon
     drive_motor_c = CANTalon
     drive_motor_d = CANTalon
-    motors = [drive_motor_a, drive_motor_b, drive_motor_c, drive_motor_d]
 
     inches_to_meters = 0.0254
     # some calculations that provide numbers used by the motion profiling
     wheel_circumference = 6*inches_to_meters*math.pi
     rotations_per_meter = 1 / wheel_circumference
     counts_per_revolution = 1440
+    counts_per_meter = counts_per_revolution*rotations_per_meter
     velocity_to_native_units = 0.1*counts_per_meter
 
 
@@ -31,6 +31,7 @@ class Chassis:
         """Run just after createObjects.
         Useful if you want to run something after just once after the
         robot code is started, that depends on injected variables"""
+        self.motors = [self.drive_motor_a, self.drive_motor_b, self.drive_motor_c, self.drive_motor_d]
 
     def on_enable(self):
         """Run every time the robot transitions to being enabled"""
@@ -47,26 +48,28 @@ class Chassis:
         self.drive_motor_d.setControlMode(CANTalon.ControlMode.Follower)
 
         for motor in self.motors:
-            self.motor.setPID(6, 0.3, 1)
+            motor.setPID(0.5, 0, 15)
 
         self.drive_motor_a.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder)
         self.drive_motor_c.setFeedbackDevice(CANTalon.FeedbackDevice.QuadEncoder)
 
-    def set_point(self, meters):
+    def set_point(self, meters1, meters2):
         for motor in self.motors:
-            self.motor.setPosition(0)
+            motor.setPosition(0)
 
-        self.setpoint = self.counts_per_revolution * (self.rotations_per_meter * meters)
+        self.setpoint1 = self.counts_per_revolution * (self.rotations_per_meter * meters1)
+        self.setpoint2 = self.counts_per_revolution * (self.rotations_per_meter * meters2)
+        print(self.setpoint1, self.setpoint2)
 
-        self.drive_motor_a.set(self.set_point)
+        self.drive_motor_a.set(self.setpoint1)
         self.drive_motor_b.set(2)
-        self.drive_motor_c.set(self.set_point)
+        self.drive_motor_c.set(self.setpoint2)
         self.drive_motor_d.set(4)
 
-        return self.setpoint
+        return self.setpoint1, self.setpoint2
 
     def get_pos(self):
-    return [self.drive_motor_a.getPosition()/self.counts_per_meter,
+        return [self.drive_motor_a.getPosition()/self.counts_per_meter,
                 -(self.drive_motor_c.getPosition()/self.counts_per_meter)]
 
     def get_velocities(self):
