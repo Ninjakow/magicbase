@@ -5,10 +5,13 @@
 # of what a component should look like.
 from ctre import CANTalon
 import math
+from components.bno055 import BNO055
+from wpilib import PIDController
 
 
 class Chassis:
 
+    bno055 = BNO055
     drive_motor_a = CANTalon
     drive_motor_b = CANTalon
     drive_motor_c = CANTalon
@@ -66,9 +69,37 @@ class Chassis:
 
         return self.setpoint
 
+    def turn(self, radians):
+        for motor in self.motors:
+            motor.setControlMode(CANTalon.ControlMode.PercentVbus)
+        print(self.bno055.getHeading())
+        self.controller = PIDController(0.5, 0, 15, self.bno055.getHeading(), self.turn_motors())
+        self.controller.setSetpoint(self.bno055.getHeading()+radians)
+        self.controller.setTolerance(5)
+        self.controller.setOutputRange(-1, 1)
+
+        return self.bno055.getHeading()+radians
+
+    def turn_successful(self):
+        if self.controller.onTarget():
+            self.controller.disable()
+
+        return self.controller.onTarget()
+
+
+    def turn_motors(self, PIDOutput):
+        # output = max(min(-1, PIDOutput), 1)
+        output = PIDOutput
+
+        self.drive_motor_a.set(output)
+        self.drive_motor_b.set(output)
+        self.drive_motor_c.set(-output)
+        self.drive_motor_d.set(-output)
+
     def get_pos(self):
-        return [self.drive_motor_a.getPosition()/self.counts_per_meter,
-                -(self.drive_motor_c.getPosition()/self.counts_per_meter)]
+        return [self.drive_motor_a.getPosition(), self.drive_motor_c.getPosition]       
+       # return [self.drive_motor_a.getPosition()/self.counts_per_meter,
+       #         -(self.drive_motor_c.getPosition()/self.counts_per_meter)]
 
     def get_velocities(self):
         return [self.drive_motor_a.getEncVelocity()/self.velocity_to_native_units,
